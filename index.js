@@ -22,7 +22,7 @@ function createStore (reducer) {
 
     // Update the state
     const dispatch = (action) => {
-        state = todos(state, action)
+        state = reducer(state, action)
         listeners.forEach((listener) => listener())
     }
 
@@ -34,8 +34,9 @@ function createStore (reducer) {
 }
 
 // APP CODE
+
 // This is a pure function because it is not modifying the state
-// This is a reducer function
+// Reducer for todos
 function todos (state = [], action) {
     switch(action.type) {
         case 'ADD_TODO' :
@@ -48,7 +49,7 @@ function todos (state = [], action) {
                 todo : 
                 Object.assign({}, todo, { complete: !todo.complete })
                 //create a new object, add all the todo apart of the complete
-                )
+            );
         default :
             return state
     }
@@ -66,7 +67,17 @@ function goals (state = [], action) {
     }
 }
 
-const store = createStore(todos)
+// Combine reducers (todos and goals)
+function app (state = {}, action) {
+    return {
+        todos: todos(state.todos, action),
+        goals: goals(state.goals, action),
+    }
+}
+
+// We pass the root reducer to our store because
+// the createStore() function can only take in one reducer
+const store = createStore(app)
 store.subscribe(()=>{
     console.log('The new state is: ', store.getState())
 })
