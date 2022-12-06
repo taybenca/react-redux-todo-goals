@@ -1,4 +1,4 @@
-// Library code
+// LIBRARY CODE
 function createStore (reducer) {
     // The store should have four parts
     // 1. The state
@@ -33,7 +33,7 @@ function createStore (reducer) {
     }
 }
 
-// App code
+// APP CODE
 // This is a pure function because it is not modifying the state
 // This is a reducer function
 function todos (state = [], action) {
@@ -49,6 +49,18 @@ function todos (state = [], action) {
                 Object.assign({}, todo, { complete: !todo.complete })
                 //create a new object, add all the todo apart of the complete
                 )
+        default :
+            return state
+    }
+}
+
+// Reducer for goals
+function goals (state = [], action) {
+    switch(action.type) {
+        case 'ADD_GOAL':
+            return state.concat([action.goal])
+        case 'REMOVE_GOAL' :
+            return state.filter((goal) => goal.id !== action.id)
         default :
             return state
     }
