@@ -42,3 +42,17 @@ function todos (state = [], action) {
 
     return state
 }
+
+const store = createStore(todos)
+store.subscribe(()=>{
+    console.log('The new state is: ', store.getState())
+})
+// All the time I want to change the state, I just need to call dispatch
+store.dispatch({
+    type: 'ADD_TODO',
+    todo: {
+        id: 0,
+        name: 'Learn Redux',
+        complete: false
+    }
+})
