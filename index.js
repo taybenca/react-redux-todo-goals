@@ -95,3 +95,7 @@ store.dispatch({
         complete: false
     }
 })
+
+// Prefer constants rather than strings as the values of type properties. 
+// Both work -- but when using constants, the console will 
+// throw an error rather than fail silently should there be any misspelling
