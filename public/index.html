@@ -144,8 +144,15 @@
     // We pass the root reducer to our store because
     // the createStore() function can only take in one reducer
     const store = createStore(app)
+
     store.subscribe(()=>{
-        console.log('The new state is: ', store.getState())
+        const { goals, todos } = store.getState()
+
+        document.getElementById('goals').innerHTML = ''
+        document.getElementById('todos').innerHTML = ''
+
+        goals.forEach(addGoalToDOM)
+        todos.forEach(addTodoToDOM)
     })
 
     // // All the time I want to change the state, I just need to call dispatch
@@ -187,6 +194,8 @@
     // Both work -- but when using constants, the console will 
     // throw an error rather than fail silently should there be any misspelling
 
+
+    // DOM code
     function addTodo () {
         const input = document.getElementById('todo')
         const name = input.value
@@ -215,6 +224,28 @@
 
     document.getElementById('goal-btn')
     .addEventListener('click', addGoal)
+
+    function addTodoToDOM (todo) {
+        const node = document.createElement('li')
+        const text = document.createTextNode(todo.name)
+        node.appendChild(text)
+        node.style.textDecoration = todo.complete ? 'line-through' : 'none'
+        node.addEventListener('click', () => {
+            store.dispatch(toggleTodoAction(todo.id))
+        })
+
+        document.getElementById('todos')
+            .appendChild(node)
+    }
+
+    function addGoalToDOM (goal) {
+        const node = document.createElement('li')
+        const text = document.createTextNode(goal.name)
+        node.appendChild(text)
+
+        document.getElementById('goals')
+            .appendChild(node)
+    }
 
     </script>
   </body>
