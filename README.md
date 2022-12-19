@@ -5,9 +5,9 @@
 ## 2. The function that returns the new state needs to be a pure function.
 Pure functions are integral to how state in Redux applications is updated. By definition, pure functions:
 
-- Return the same result if the same arguments are passed in
-- Depend solely on the arguments passed into them
-- Do not produce side effects, such as API requests and I/O operations
+- Return the same result if the same arguments are passed in.
+- Depend solely on the arguments passed into them.
+- Do not produce side effects, such as API requests and I/O operations.
 
 ***
 ## Reducers
