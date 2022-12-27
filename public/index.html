@@ -129,10 +129,17 @@
         return result
     }
 
+    const greatGoal = (store) => (next) => (action) => {
+        if (action.type === ADD_GOAL){
+            return alert("That's a great goal!")
+        }
+        return next(action)
+    }
+
     const store = Redux.createStore(Redux.combineReducers({
         todos,
         goals,
-    }), Redux.applyMiddleware(checker, logger));
+    }), Redux.applyMiddleware(checker, logger, greatGoal));
 
     store.subscribe(()=>{
         const { goals, todos } = store.getState()
