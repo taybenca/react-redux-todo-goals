@@ -102,30 +102,37 @@
         }
     }
 
-    function checkAndDispatch(store, action) {
+    const checker = (store) => (next) => (action) => {
         if (
-          action.type === ADD_TODO &&
-          action.todo.name.toLowerCase().includes("bitcoin")
+            action.type === ADD_TODO &&
+            action.todo.name.toLowerCase().includes("bitcoin")
         ) {
-          return alert("Nope. That's a bad idea.");
+            return alert("Nope. That's a bad idea.");
         }
-
+    
         if (
-          action.type === ADD_GOAL &&
-          action.goal.name.toLowerCase().includes("bitcoin")
+            action.type === ADD_GOAL &&
+            action.goal.name.toLowerCase().includes("bitcoin")
         ) {
-          return alert("Nope. That's a bad idea.");
+            return alert("Nope. That's a bad idea.");
         }
-
-        return store.dispatch(action);
+    
+        return next(action);
     }
 
-    const store = Redux.createStore(
-        Redux.combineReducers({
-          todos,
-          goals,
-        })
-    );
+    const logger = (store) => (next) => (action) => {
+        console.group(action.type)
+            console.log('The action: ', action)
+            const result = next(action)
+            console.log('The new state: ', store.getState())
+        console.groupEnd()
+        return result
+    }
+
+    const store = Redux.createStore(Redux.combineReducers({
+        todos,
+        goals,
+    }), Redux.applyMiddleware(checker, logger));
 
     store.subscribe(()=>{
         const { goals, todos } = store.getState()
@@ -136,7 +143,6 @@
         goals.forEach(addGoalToDOM)
         todos.forEach(addTodoToDOM)
     })
-
 
     // Prefer constants rather than strings as the values of type properties. 
     // Both work -- but when using constants, the console will 
@@ -149,8 +155,7 @@
         const name = input.value
         input.value = ''
 
-        checkAndDispatch(
-            store, 
+        store.dispatch( 
             addTodoAction({
                 name,
                 complete: false,
@@ -164,8 +169,7 @@
         const name = input.value
         input.value = ''
 
-        checkAndDispatch(
-            store,
+        store.dispatch(
             addGoalAction({
                 name,
                 id: generateId()
@@ -189,15 +193,16 @@
     function addTodoToDOM (todo) {
         const node = document.createElement('li')
         const text = document.createTextNode(todo.name)
+
         const removeBtn = createRemoveButton(() => {
-            checkAndDispatch(store, removeTodoAction(todo.id))
+            store.dispatch(removeTodoAction(todo.id))
         })
 
         node.appendChild(text)
         node.appendChild(removeBtn)
         node.style.textDecoration = todo.complete ? 'line-through' : 'none'
         node.addEventListener('click', () => {
-            checkAndDispatch(store, toggleTodoAction(todo.id))
+            store.dispatch(toggleTodoAction(todo.id))
         })
 
         document.getElementById('todos')
@@ -207,8 +212,9 @@
     function addGoalToDOM (goal) {
         const node = document.createElement('li')
         const text = document.createTextNode(goal.name)
+        
         const removeBtn = createRemoveButton(() => {
-            checkAndDispatch(store, removeGoalAction(goal.id))
+            store.dispatch(removeGoalAction(goal.id))
         })
 
         node.appendChild(text)
