@@ -137,17 +137,17 @@
         return result
     }
 
-    const greatGoal = (store) => (next) => (action) => {
-        if (action.type === ADD_GOAL){
-            return alert("That's a great goal!")
-        }
-        return next(action)
-    }
+    // const greatGoal = (store) => (next) => (action) => {
+    //     if (action.type === ADD_GOAL){
+    //         return alert("That's a great goal!")
+    //     }
+    //     return next(action)
+    // }
 
     const store = Redux.createStore(Redux.combineReducers({
         todos,
         goals,
-    }), Redux.applyMiddleware(checker, logger, greatGoal));
+    }), Redux.applyMiddleware(checker, logger));
 
     store.subscribe(()=>{
         const { goals, todos } = store.getState()
@@ -279,10 +279,28 @@
             )
         }
 
-        const Goals = () => {
+        const Goals = (props) => {
+            const inputRef = React.useRef();
+
+            const addItem = (e) => {
+                e.preventDefault()
+                const name = inputRef.current.value;
+                inputRef.current.value = "";
+
+                props.store.dispatch(addGoalAction({
+                    id: generateId(),
+                    name
+                }))
+            }
+
             return (
                 <div>
-                    GOALS
+                    <h1>Goals</h1>
+                    <input 
+                        type="text" 
+                        placeholder="Add Goal" 
+                        ref={inputRef}/>
+                        <button onClick={addItem}>Add Goal</button>
                     <List />
                 </div>
             )
@@ -292,7 +310,7 @@
             return (
                 <div>
                     <Todos store={props.store}/>
-                    <Goals />
+                    <Goals store={props.store} />
                 </div>
             )
         }
