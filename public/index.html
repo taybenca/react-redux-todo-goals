@@ -8,32 +8,15 @@
     <script src="https://unpkg.com/@babel/standalone@7.17.6/babel.min.js"></script>  
   </head>
   <body>
-    <!-- TODO -->
-    <div>
-      <h1>Todo List</h1>
-      <input id="todo" type="text" placeholder="Add todo"/>
-      <button id="todo-btn">Add todo</button>
-      <ul id="todos"></ul>
-    </div>
-    <!-- GOALS -->
-    <div>
-      <h1>Goals List</h1>
-      <input id="goal" type="text" placeholder="Add goal"/>
-      <button id="goal-btn">Add goal</button>
-      <ul id="goals"></ul>
-    </div>
-
-    <hr />
-
     <div id="app"></div>
-
     <script type="text/javascript">
-        function generateId () {
-            return (
-                Math.random().toString(36).substring(2) +
-                new Date().getTime().toString(36)
-            )
-        }
+
+    function generateId () {
+        return (
+            Math.random().toString(36).substring(2) +
+            new Date().getTime().toString(36)
+        )
+    }
 
     // APP CODE
     const ADD_TODO = 'ADD_TODO'
@@ -137,220 +120,126 @@
         return result
     }
 
-    // const greatGoal = (store) => (next) => (action) => {
-    //     if (action.type === ADD_GOAL){
-    //         return alert("That's a great goal!")
-    //     }
-    //     return next(action)
-    // }
-
     const store = Redux.createStore(Redux.combineReducers({
         todos,
         goals,
     }), Redux.applyMiddleware(checker, logger));
 
-    store.subscribe(()=>{
-        const { goals, todos } = store.getState()
-
-        document.getElementById('goals').innerHTML = ''
-        document.getElementById('todos').innerHTML = ''
-
-        goals.forEach(addGoalToDOM)
-        todos.forEach(addTodoToDOM)
-    })
-
-    // Prefer constants rather than strings as the values of type properties. 
-    // Both work -- but when using constants, the console will 
-    // throw an error rather than fail silently should there be any misspelling
-
-
-    // DOM code
-    function addTodo () {
-        const input = document.getElementById('todo')
-        const name = input.value
-        input.value = ''
-
-        store.dispatch( 
-            addTodoAction({
-                name,
-                complete: false,
-                id: generateId()
-            })
-        )
-    }
-
-    function addGoal () {
-        const input = document.getElementById('goal')
-        const name = input.value
-        input.value = ''
-
-        store.dispatch(
-            addGoalAction({
-                name,
-                id: generateId()
-            })
-        )
-    }
-
-    document.getElementById('todo-btn')
-    .addEventListener('click', addTodo)
-
-    document.getElementById('goal-btn')
-    .addEventListener('click', addGoal)
-
-    function createRemoveButton (onClick) {
-        const removeBtn = document.createElement('button')
-        removeBtn.innerHTML = 'X'
-        removeBtn.addEventListener('click', onClick)
-        return removeBtn
-    }
-
-    function addTodoToDOM (todo) {
-        const node = document.createElement('li')
-        const text = document.createTextNode(todo.name)
-
-        const removeBtn = createRemoveButton(() => {
-            store.dispatch(removeTodoAction(todo.id))
-        })
-
-        node.appendChild(text)
-        node.appendChild(removeBtn)
-        node.style.textDecoration = todo.complete ? 'line-through' : 'none'
-        node.addEventListener('click', () => {
-            store.dispatch(toggleTodoAction(todo.id))
-        })
-
-        document.getElementById('todos')
-            .appendChild(node)
-    }
-
-    function addGoalToDOM (goal) {
-        const node = document.createElement('li')
-        const text = document.createTextNode(goal.name)
-        
-        const removeBtn = createRemoveButton(() => {
-            store.dispatch(removeGoalAction(goal.id))
-        })
-
-        node.appendChild(text)
-        node.append(removeBtn)
-
-        document.getElementById('goals')
-            .appendChild(node)
-    }
     </script>
 
     <script type="text/babel">
-        const List = (props) => {
-            return (
-                <ul>
-                {props.items && props.items.map((item) => (
-                    <li key={item.id}>
-                        <span 
-                        style={{
-                            textDecoration: item.complete ? "line-through" : "none",
-                        }}
-                        onClick={
-                            () => props.toggle && props.toggle(item.id)}>
-                            {item.name}
-                        </span>
-                        <button onClick={() => props.remove(item)}>X</button>
-                    </li>
-                ))}
-                </ul>
-            )
+
+    const List = (props) => {
+        return (
+            <ul>
+            {props.items && props.items.map((item) => (
+                <li key={item.id}>
+                    <span 
+                    style={{
+                        textDecoration: item.complete ? "line-through" : "none",
+                    }}
+                    onClick={
+                        () => props.toggle && props.toggle(item.id)}>
+                        {item.name}
+                    </span>
+                    <button onClick={() => props.remove(item)}>X</button>
+                </li>
+            ))}
+            </ul>
+        )
+    }
+
+    const Todos = (props) => {
+        const inputRef = React.useRef();
+
+        const addItem = (e) => {
+            e.preventDefault();
+            const name = inputRef.current.value;
+            inputRef.current.value = "";
+
+            props.store.dispatch(addTodoAction({
+                name,
+                complete: false,
+                id: generateId()
+            }))
         }
 
-        const Todos = (props) => {
-            const inputRef = React.useRef();
-
-            const addItem = (e) => {
-                e.preventDefault();
-                const name = inputRef.current.value;
-                inputRef.current.value = "";
-
-                props.store.dispatch(addTodoAction({
-                    name,
-                    complete: false,
-                    id: generateId()
-                }))
-            }
-
-            const removeItem = (todo) => {
-                props.store.dispatch(removeTodoAction(todo.id))
-            }
-
-            const toggleItem = (id) => {
-                props.store.dispatch(toggleTodoAction(id));
-            }
-
-            return (
-                <div>
-                    <h1>Todo List</h1>
-                    <input 
-                        type="text" 
-                        placeholder="Add Todo"
-                        ref={inputRef}
-                    />
-                    <button onClick={addItem}>Add Todo</button>
-                    <List 
-                        toggle={toggleItem} 
-                        remove={removeItem} 
-                        items={props.todos}
-                    />
-                </div>
-            )
+        const removeItem = (todo) => {
+            props.store.dispatch(removeTodoAction(todo.id))
         }
 
-        const Goals = (props) => {
-            const inputRef = React.useRef();
-
-            const addItem = (e) => {
-                e.preventDefault()
-                const name = inputRef.current.value;
-                inputRef.current.value = "";
-
-                props.store.dispatch(addGoalAction({
-                    id: generateId(),
-                    name
-                }))
-            }
-            const removeItem = (goal) => {
-                props.store.dispatch(removeGoalAction(goal.id))
-            }
-
-            return (
-                <div>
-                    <h1>Goals</h1>
-                    <input 
-                        type="text" 
-                        placeholder="Add Goal" 
-                        ref={inputRef}/>
-                        <button onClick={addItem}>Add Goal</button>
-                    <List remove={removeItem} items={props.goals}/>
-                </div>
-            )
+        const toggleItem = (id) => {
+            props.store.dispatch(toggleTodoAction(id));
         }
 
-        const App = (props) => {
-            const [value, setValue] = React.useState(0)
+        return (
+            <div>
+                <h1>Todo List</h1>
+                <input 
+                    type="text" 
+                    placeholder="Add Todo"
+                    ref={inputRef}
+                />
+                <button onClick={addItem}>Add Todo</button>
+                <List 
+                    toggle={toggleItem} 
+                    remove={removeItem} 
+                    items={props.todos}
+                />
+            </div>
+        )
+    }
 
-            React.useEffect(() => {
-                props.store.subscribe(() => {
-                    setValue((value) => value + 1)
-                })
-            }, [])
+    const Goals = (props) => {
+        const inputRef = React.useRef();
 
-            const { todos, goals } = props.store.getState()
+        const addItem = (e) => {
+            e.preventDefault()
+            const name = inputRef.current.value;
+            inputRef.current.value = "";
 
-            return (
-                <div>
-                    <Todos todos={todos} store={props.store}/>
-                    <Goals goals={goals} store={props.store} />
-                </div>
-            )
+            props.store.dispatch(addGoalAction({
+                id: generateId(),
+                name
+            }))
         }
-        ReactDOM.render(<App store={store}/>, document.getElementById("app"))
+        const removeItem = (goal) => {
+            props.store.dispatch(removeGoalAction(goal.id))
+        }
+
+        return (
+            <div>
+                <h1>Goals</h1>
+                <input 
+                    type="text" 
+                    placeholder="Add Goal" 
+                    ref={inputRef}/>
+                    <button onClick={addItem}>Add Goal</button>
+                <List remove={removeItem} items={props.goals}/>
+            </div>
+        )
+    }
+
+    const App = (props) => {
+        const [value, setValue] = React.useState(0)
+
+        React.useEffect(() => {
+            props.store.subscribe(() => {
+                setValue((value) => value + 1)
+            })
+        }, [])
+
+        const { todos, goals } = props.store.getState()
+
+        return (
+            <div>
+                <Todos todos={todos} store={props.store}/>
+                <Goals goals={goals} store={props.store} />
+            </div>
+        )
+    }
+    ReactDOM.render(<App store={store}/>, document.getElementById("app"))
+
     </script>
   </body>
 </html>
