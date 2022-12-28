@@ -244,23 +244,34 @@
         )
     }
 
+    const ConnectedTodos = () => {
+        return(
+            <Context.Consumer>
+                {(store) => {
+                    const { todos } = store.getState()
+                    return <Todos todos={todos} dispatch={store.dispatch}/>
+                }}
+            </Context.Consumer>
+        )
+    }
+
     const Todos = (props) => {
         const inputRef = React.useRef();
 
         const addItem = (e) => {
             e.preventDefault();
-            props.store.dispatch(handleAddTodo(
+            props.dispatch(handleAddTodo(
                 inputRef.current.value, 
                 () => inputRef.current.value = ""
             ))
         }
 
         const removeItem = (todo) => {
-            props.store.dispatch(handleDeleteTodo(todo))
+            props.dispatch(handleDeleteTodo(todo))
         }
 
         const toggleItem = (id) => {
-            props.store.dispatch(handleToggle(id));
+            props.dispatch(handleToggle(id));
         }
 
         return (
@@ -281,19 +292,30 @@
         )
     }
 
+    const ConnectedGoals = () => {
+        return (
+            <Context.Consumer>
+                {(store) => {
+                    const { goals } = store.getState()
+                    return <Goals goals={goals} dispatch={store.dispatch} />
+                }}
+            </Context.Consumer>
+        )
+    }
+
     const Goals = (props) => {
         const inputRef = React.useRef();
 
         const addItem = (e) => {
             e.preventDefault()
-            props.store.dispatch(handleAddGoal(
+            props.dispatch(handleAddGoal(
                 inputRef.current.value,
                 () => (inputRef.current.value = "")
             ))
         }
 
         const removeItem = (goal) => {
-            props.store.dispatch(handleDeleteGoal(goal))
+            props.dispatch(handleDeleteGoal(goal))
         }
 
         return (
@@ -313,30 +335,53 @@
         const [value, setValue] = React.useState(0)
 
         React.useEffect(() => {
-            props.store.subscribe(() => {
+            store.dispatch(handleInitialData())
+
+            store.subscribe(() => {
                 setValue((value) => value + 1)
             })
         }, [])
 
-        React.useEffect(() => {
-            props.store.dispatch(handleInitialData())
-        }, []);
-
-        const { todos, goals, loading } = props.store.getState()
+        const { loading } = props.store.getState()
 
         if (loading === true) {
-            return <h3>loading...</h3>
+            return <h3>Loading...</h3>
         }
 
         return (
             <div>
-                <Todos todos={todos} store={props.store}/>
-                <Goals goals={goals} store={props.store} />
+                <ConnectedTodos />
+                <ConnectedGoals />
             </div>
         )
     }
-    ReactDOM.render(<App store={store}/>, document.getElementById("app"))
 
+    const ConnectedApp = () => {
+        return (
+            <Context.Consumer>
+                {(store) => {
+                    return <App store={store}/>
+                }}
+            </Context.Consumer>
+        )
+    }
+
+    const Context = React.createContext();
+
+    const Provider = (props) => {
+        return (
+            <Context.Provider value={props.store}>
+                {props.children}
+            </Context.Provider>
+        )
+    }
+
+    ReactDOM.render(
+        <Provider store={store}>
+            <ConnectedApp />
+        </Provider>, 
+        document.getElementById("app")
+    )
     </script>
   </body>
 </html>
