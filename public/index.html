@@ -5,7 +5,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/4.1.2/redux.min.js"></script>
     <script src="https://unpkg.com/react@17.0.2/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone@7.17.6/babel.min.js"></script>  
+    <script src="https://unpkg.com/@babel/standalone@7.17.6/babel.min.js"></script> 
+    <script src="https://tylermcginnis.com/goals-todos-api/index.js"></script>
+    <!-- <script src="https://ui.dev/goals-todos-api/index.js"></script> -->
   </head>
   <body>
     <div id="app"></div>
@@ -24,6 +26,7 @@
     const TOGGLE_TODO = 'TOGGLE_TODO'
     const ADD_GOAL = 'ADD_GOAL'
     const REMOVE_GOAL = 'REMOVE_GOAL'
+    const RECEIVE_DATA = 'RECEIVE_DATA'
 
     // Action creators
     function addTodoAction (todo) {
@@ -61,6 +64,14 @@
         }
     }
 
+    function receiveDataAction (todos, goals) {
+        return {
+            type: RECEIVE_DATA,
+            todos,
+            goals,
+        }
+    }
+
     // This is a pure function because it is not modifying the state
     // Reducer for todos
     function todos (state = [], action) {
@@ -76,6 +87,8 @@
                     Object.assign({}, todo, { complete: !todo.complete })
                     //create a new object, add all the todo apart of the complete
                 );
+            case RECEIVE_DATA :
+                return action.todos;
             default :
                 return state
         }
@@ -88,6 +101,8 @@
                 return state.concat([action.goal])
             case REMOVE_GOAL :
                 return state.filter((goal) => goal.id !== action.id)
+            case RECEIVE_DATA :
+                return action.goals
             default :
                 return state
         }
@@ -228,6 +243,12 @@
                 setValue((value) => value + 1)
             })
         }, [])
+
+        React.useEffect(() => {
+            Promise.all([API.fetchTodos(), API.fetchGoals()]).then(([todos, goals]) => {
+                props.store.dispatch(receiveDataAction(todos, goals))
+            });
+        }, []);
 
         const { todos, goals } = props.store.getState()
 
