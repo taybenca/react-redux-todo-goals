@@ -195,12 +195,18 @@
             return API.deleteTodo(todo.id)
             .catch(() => {
                 props.store.dispatch(addTodoAction(todo));
-                alert('An error occured. Try again.')
+                alert('An error occurred. Try again.')
             })
         }
 
         const toggleItem = (id) => {
             props.store.dispatch(toggleTodoAction(id));
+
+            return API.saveTodoToggle(id)
+            .catch(() => {
+                props.store.dispatch(toggleTodoAction(id));
+                alert('An error occurred. Try again.')
+            })
         }
 
         return (
