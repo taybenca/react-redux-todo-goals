@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
 import { useRef } from "react";
-import List from './List'
+import { List } from './List'
 import { handleAddGoal, handleDeleteGoal } from '../actions/goals'
 
 const Goals = (props) => {

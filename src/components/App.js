@@ -5,7 +5,7 @@ import { connect } from "react-redux"
 import { handleInitialData } from "../actions/shared"
 
 const App = (props) => {
-  useEffect(() => {
+  useEffect((props) => {
       props.dispatch(handleInitialData())
   }, [])
 

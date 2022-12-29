@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { connect } from 'react-redux';
 import { handleAddTodo, handleDeleteTodo, handleToggle } from '../actions/todos'
-import List from './List'
+import { List } from './List'
 
 const Todos = (props) => {
     const inputRef = useRef();
