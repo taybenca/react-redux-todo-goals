@@ -21,69 +21,8 @@
         )
     }
 
-    // APP CODE
-   
-    const ADD_GOAL = 'ADD_GOAL'
-    const REMOVE_GOAL = 'REMOVE_GOAL'
-    const RECEIVE_DATA = 'RECEIVE_DATA'
-
     
-    function addGoal (goal) {
-        return {
-            type: ADD_GOAL,
-            goal
-        }
-    }
-    
-    function removeGoalAction (id) {
-        return {
-            type: REMOVE_GOAL,
-            id
-        }
-    }
-
-    function receiveDataAction (todos, goals) {
-        return {
-            type: RECEIVE_DATA,
-            todos,
-            goals,
-        }
-    }
-
-    function handleAddGoal (name, cb) {
-        return (dispatch) => {
-            return API.saveGoal(name)
-            .then((goal) => {
-                dispatch(addGoalAction(goal));
-                cb();
-            })
-            .catch(() => {
-                alert('There was an error. Try again.')
-            })
-        }
-    }
-
-    function handleDeleteGoal (goal) {
-        return (dispatch) => {
-            dispatch(removeGoalAction(goal.id))
-            return API.deleteGoal(goal.id)
-            .catch(() => {
-                dispatch(addGoalAction(goal));
-                alert('An error occurred. Try again.')
-            })
-        }
-    }
-
-    
-
-    function handleInitialData () {
-        return (dispatch) => {
-            Promise.all([API.fetchTodos(), API.fetchGoals()])
-            .then(([todos, goals]) => {
-                dispatch(receiveDataAction(todos, goals))
-            })
-        }
-    }
+  
 
     // This is a pure function because it is not modifying the state
     // Reducer for todos
